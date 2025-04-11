@@ -36,7 +36,7 @@ router.put("/:id", async (req, res) => {
         let isJobExists = await JobModel.findOne({ _id: id, user: req.user.userId })
         if (!isJobExists) throw "Job not found"
         
-        let updateJob = await JobModel.findByIdAndUpdate(id, req.body, { new: true })
+        let updateJob = await JobModel.findByIdAndUpdate(id, {...req.body, user: req.user.userId }, { new: true })
         res.status(201).json(updateJob)
     } catch (e) {
         return res.status(400).json(e)
@@ -48,8 +48,9 @@ router.delete("/:id", async (req, res) => {
         if (!req.user || !req.user.userId) return res.status(401).json({ message: "Unauthorized token" })
 
         const { id } = req.params
-        await JobModel.findByIdAndDelete(id)
-
+        const deletedJob = await JobModel.findOneAndDelete({ _id: id, user: req.user.userId })
+        // await JobModel.findByIdAndDelete(id)
+        if (!deletedJob) return res.status(400).json({ error: "Job not found in user's job list" })
         res.status(200).json({message: "Job deleted successfully"})
     } catch (e) {
         return res.status(400).json(e)
