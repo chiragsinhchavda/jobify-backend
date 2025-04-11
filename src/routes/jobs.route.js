@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-const JobModel = require("../model/job.model")
+const JobModel = require("../models/job.model")
 const auth = require("../middleware/auth.middleware")
 
 router.use(auth)
