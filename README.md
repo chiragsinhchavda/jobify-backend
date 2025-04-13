@@ -8,6 +8,9 @@ A secure backend job tracker built with Node.js, Express, MongoDB, JWT.
 ## Live URL
 https://jobify-backend-n195.onrender.com
 
+## Swagger
+https://jobify-backend-n195.onrender.com/docs
+
 ## Tech Stack
 - Node.js
 - Express
