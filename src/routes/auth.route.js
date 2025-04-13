@@ -66,8 +66,13 @@ const bcrypt = require("bcrypt")
 
 router.post("/register", async (req, res) => {
     try {
+        const regx = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+        const passregx = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/
+        
         const { name, email, password } = req.body
         if ( !name || !email || !password ) return res.status(401).json({ message: "Required values not found!"})
+        if (!regx.test(email)) return res.status(401).json({ message: "Please enter a valid email address"})
+        if (!passregx.test(password)) return res.status(401).json({ message: "Please enter a valid password"})
 
         let isUserExists = await UserModel.findOne({ email })
         if (isUserExists) return res.status(401).json({ message: "User already exists!" })
@@ -86,8 +91,13 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
     try {
+        const regx = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+        const passregx = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/
+
         const { email, password } = req.body
         if ( !email || !password ) return res.status(401).json({ message: "Required values not found!"})
+        if (!regx.test(email)) return res.status(401).json({ message: "Please enter a valid email address"})
+        if (!passregx.test(password)) return res.status(401).json({ message: "Please enter a valid password"})
 
         let isUserExists = await UserModel.findOne({ email })
         if (!isUserExists) return res.status(401).json({ message: "User not found!" })
