@@ -5,6 +5,26 @@ const auth = require("../middleware/auth.middleware")
 
 router.use(auth)
 
+/**
+ * @swagger
+ * tags:
+ *   name: Jobs
+ *   description: Job CRUD routes
+ */
+
+/**
+ * @swagger
+ * /jobs:
+ *   get:
+ *     summary: Get all jobs for the logged-in user
+ *     tags: [Jobs]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of jobs
+ */
+
 router.get("/", async (req, res) => {
     try {
         const jobs = await JobModel.find({ user: req.user.userId }).sort("-createdAt");
@@ -13,6 +33,34 @@ router.get("/", async (req, res) => {
         return res.status(400).json({ message: "Something went wrong!"})
     }
 })
+
+/**
+ * @swagger
+ * /jobs:
+ *   post:
+ *     summary: Create a new job
+ *     tags: [Jobs]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               company:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *                 enum: [pending, interview, declined]
+ *     responses:
+ *       201:
+ *         description: Job created
+ */
+
 
 router.post("/", async (req, res) => {
     try {
@@ -28,6 +76,39 @@ router.post("/", async (req, res) => {
     }
 })
 
+/**
+ * @swagger
+ * /jobs/{id}:
+ *   put:
+ *     summary: Update a job
+ *     tags: [Jobs]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Job ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               company:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Job updated
+ */
+
 router.put("/:id", async (req, res) => {
     try {
         if (!req.user || !req.user.userId) return res.status(401).json({ message: "Unauthorized token" })
@@ -42,6 +123,27 @@ router.put("/:id", async (req, res) => {
         return res.status(400).json(e)
     }
 })
+
+/**
+ * @swagger
+ * /jobs/{id}:
+ *   delete:
+ *     summary: Delete a job
+ *     tags: [Jobs]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Job ID
+ *     responses:
+ *       200:
+ *         description: Job deleted
+ */
+
 
 router.delete("/:id", async (req, res) => {
     try {

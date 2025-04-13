@@ -2,11 +2,15 @@ const express = require("express")
 const connectDb = require("./src/db/connection")
 require("dotenv").config()
 const app  = express()
-app.use(express.json())
 const PORT = process.env.PORT || 5000
 const AuthRoutes = require("./src/routes/auth.route")
 const JobRoutes = require("./src/routes/jobs.route")
 
+const swaggerUI = require("swagger-ui-express");
+const swaggerSpec = require("./swagger");
+
+app.use(express.json())
+app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 app.get("/", (req, res) => {
     res.send({
