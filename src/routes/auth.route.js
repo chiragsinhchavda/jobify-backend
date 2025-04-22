@@ -2,6 +2,8 @@ const express = require("express")
 const router = express.Router()
 const UserModel = require("../models/user.model")
 const bcrypt = require("bcrypt")
+const { sendMail } = require("../utils/sendMail")
+const jwt = require("jsonwebtoken")
 
 /**
  * @swagger
@@ -107,6 +109,81 @@ router.post("/login", async (req, res) => {
         
         let token = isUserExists.createJWT()
         res.status(200).json({ user: { name: isUserExists.name, email: isUserExists.email }, token: token })
+    } catch (e) {
+        return res.status(400).json(e)
+    }
+})
+
+/**
+ * @swagger
+ * /auth/verify/email:
+ *   post:
+ *     summary: Verify email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Email sent successfully
+ */
+
+/**
+ * @swagger
+ * /auth/verify/{token}:
+ *   get:
+ *     summary: Email token verification
+ *     tags: [Auth]
+ *     parameters:
+ *       - name: token
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Email token
+ *     responses:
+ *       200:
+ *         description: Email verified successfully
+ */
+
+router.post("/verify/email", (req, res) => {
+    try {
+        const { email } = req.body
+        const regx = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+        if ( !email ) return res.status(401).json({ message: "Required values not found!"})
+        if (!regx.test(email)) return res.status(401).json({ message: "Please enter a valid email address"})
+        sendMail([email])
+        res.status(200).json({
+            message: "Email sent successfully"
+        })
+    } catch (e) {
+        return res.status(400).json(e)
+    }
+})
+
+router.get('/verify/:token', (req, res) => {
+    try {
+        const { token } = req.params
+        if (!token) return res.status(400).json({
+            message: "Token not found"
+        })
+        jwt.verify(token, "emailSecretKey", (error, data) => {
+            if(error) {
+                return res.status(400).json(err)
+            } else {
+                res.status(200).json({
+                    message: "Email Verified Successfully"
+                })
+            }
+        })
     } catch (e) {
         return res.status(400).json(e)
     }
